@@ -1,0 +1,8 @@
+{
+  "name": "Interest Studio",
+  "description": "Compare simple vs. yearly compound interest and calculate compounding returns with Indian currency formatting and inflation adjustment.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

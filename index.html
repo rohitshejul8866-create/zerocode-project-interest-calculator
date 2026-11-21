@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interest Studio</title>
+    <meta
+      name="description"
+      content="Compare simple vs. yearly compound interest and calculate compounding returns with Indian currency formatting and optional inflation adjustment."
+    />
+    <meta property="og:title" content="Interest Studio" />
+    <meta
+      property="og:description"
+      content="Compare simple vs. yearly compound interest and calculate compounding returns with Indian currency formatting and optional inflation adjustment."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a href="#compare" class="brand" id="brand-link">Interest Studio</a>
+
+        <div class="tablist" role="tablist" aria-label="Interest Studio modes">
+          <button
+            type="button"
+            role="tab"
+            id="tab-compare"
+            class="tab-btn is-active"
+            aria-selected="true"
+            aria-controls="panel-compare"
+          >
+            Compare
+          </button>
+          <button
+            type="button"
+            role="tab"
+            id="tab-calculator"
+            class="tab-btn"
+            aria-selected="false"
+            aria-controls="panel-calculator"
+          >
+            Calculator
+          </button>
+          <button
+            type="button"
+            role="tab"
+            id="tab-goal"
+            class="tab-btn"
+            aria-selected="false"
+            aria-controls="panel-goal"
+          >
+            Goal
+          </button>
+        </div>
+
+        <div class="topbar-actions">
+          <button
+            type="button"
+            id="theme-toggle"
+            class="theme-btn"
+            aria-pressed="false"
+            aria-label="Toggle dark mode"
+          >
+            Dark mode
+          </button>
+          <button type="button" id="reset-btn" class="reset-btn">Reset Defaults</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <!-- Tab 1: Compare -->
+      <section
+        id="panel-compare"
+        class="tab-panel"
+        role="tabpanel"
+        aria-labelledby="tab-compare"
+      >
+        <div class="section-head">
+          <div>
+            <h1>Simple vs. Yearly Compound</h1>
+            <p class="section-sub">
+              Compare linear returns against annual compounding over 1 to 30 years.
+            </p>
+          </div>
+          <div class="formula-note">
+            <span>Simple = P + P&times;R&times;T/100</span>
+            <span aria-hidden="true">&middot;</span>
+            <span>Compound = P&times;(1 + R/100)<sup>T</sup></span>
+          </div>
+        </div>
+
+        <div class="studio-grid">
+          <form class="panel inputs-panel" id="compare-form" novalidate>
+            <h2 class="panel-title">Parameters</h2>
+
+            <div class="field">
+              <label for="cmp-principal">Principal Amount (&rupee;)</label>
+              <div class="input-wrap">
+                <span class="input-prefix" aria-hidden="true">&#8377;</span>
+                <input
+                  type="number"
+                  id="cmp-principal"
+                  name="principal"
+                  value="10000"
+                  min="0"
+                  step="any"
+                  inputmode="decimal"
+                  aria-describedby="cmp-principal-error"
+                />
+              </div>
+              <p class="field-error" id="cmp-principal-error" role="alert"></p>
+            </div>
+
+            <div class="field">
+              <label for="cmp-rate">Annual Interest Rate (%)</label>
+              <div class="input-wrap">
+                <input
+                  type="number"
+                  id="cmp-rate"
+                  name="rate"
+                  value="10"
+                  min="0"
+                  step="any"
+                  inputmode="decimal"
+                  aria-describedby="cmp-rate-error"
+                />
+                <span class="input-suffix" aria-hidden="true">%</span>
+              </div>
+              <p class="field-error" id="cmp-rate-error" role="alert"></p>
+            </div>
+
+            <div class="field">
+              <div class="field-label-row">
+                <label for="cmp-years">Time Period (Years)</label>
+                <div class="input-wrap input-wrap-compact">
+                  <input
+                    type="number"
+                    id="cmp-years"
+                    name="years"
+                    value="3"
+                    min="1"
+                    max="30"
+                    step="1"
+                    inputmode="numeric"
+                    aria-describedby="cmp-years-error"
+                  />
+                  <span class="input-suffix" aria-hidden="true">yrs</span>
+                </div>
+              </div>
+              <input
+                type="range"
+                id="cmp-years-slider"
+                class="range-slider"
+                value="3"
+                min="1"
+                max="30"
+                step="1"
+                aria-label="Time period in years"
+              />
+              <div class="range-scale" aria-hidden="true">
+                <span>1 yr</span>
+                <span>15 yrs</span>
+                <span>30 yrs</span>
+              </div>
+              <p class="field-error" id="cmp-years-error" role="alert"></p>
+            </div>
+
+            <hr class="panel-divider" />
+
+            <div class="field">
+              <div class="field-label-row">
+                <label for="cmp-inflation">Inflation Rate (% / yr)</label>
+                <span class="field-optional">Optional</span>
+              </div>
+              <div class="input-wrap">
+                <input
+                  type="number"
+                  id="cmp-inflation"
+                  name="inflation"
+                  value=""
+                  placeholder="0 (optional)"
+                  min="0"
+                  step="any"
+                  inputmode="decimal"
+                  aria-describedby="cmp-inflation-hint cmp-inflation-error"
+                />
+                <span class="input-suffix" aria-hidden="true">%</span>
+              </div>
+              <p class="field-hint" id="cmp-inflation-hint">
+                Adjusts final amounts into today's purchasing power.
+              </p>
+              <p class="field-error" id="cmp-inflation-error" role="alert"></p>
+            </div>
+          </form>
+
+          <div class="results-column">
+            <div class="kpi-grid">
+              <div class="panel kpi-card">
+                <div class="kpi-label">Simple Final Amount</div>
+                <div class="kpi-value" id="cmp-simple-final">&#8377;13,000.00</div>
+                <div class="kpi-meta">
+                  <span>Interest: <strong id="cmp-simple-interest">&#8377;3,000.00</strong></span>
+                </div>
+                <div class="kpi-real">
+                  <span>Inflation-adjusted</span>
+                  <strong id="cmp-simple-real">&#8377;13,000.00</strong>
+                </div>
+              </div>
+
+              <div class="panel kpi-card kpi-card-accent">
+                <div class="kpi-label">Yearly Compound Final</div>
+                <div class="kpi-value" id="cmp-compound-final">&#8377;13,310.00</div>
+                <div class="kpi-meta">
+                  <span>Interest: <strong id="cmp-compound-interest">&#8377;3,310.00</strong></span>
+                </div>
+                <div class="kpi-real">
+                  <span>Inflation-adjusted</span>
+                  <strong id="cmp-compound-real">&#8377;13,310.00</strong>
+                </div>
+              </div>
+
+              <div class="panel kpi-card">
+                <div class="kpi-label">Compound Advantage</div>
+                <div class="kpi-value" id="cmp-difference">&#8377;310.00</div>
+                <div class="kpi-meta">
+                  <span><strong id="cmp-diff-pct">+2.38%</strong> over simple</span>
+                </div>
+                <div class="kpi-real">
+                  <span>Real difference</span>
+                  <strong id="cmp-diff-real">&#8377;310.00</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel chart-panel">
+              <div class="chart-header">
+                <div>
+                  <h2 class="panel-title">Growth Comparison</h2>
+                  <p class="chart-subtitle" id="chart-subtitle">
+                    Year-by-year trajectory over 3 years
+                  </p>
+                </div>
+                <div class="chart-legend" aria-label="Chart legend">
+                  <span class="legend-item">
+                    <span class="legend-line legend-line-compound" aria-hidden="true"></span>
+                    <span>Yearly Compound</span>
+                  </span>
+                  <span class="legend-item">
+                    <span class="legend-line legend-line-simple" aria-hidden="true"></span>
+                    <span>Simple</span>
+                  </span>
+                </div>
+              </div>
+
+              <div class="chart-wrap" id="chart-wrap">
+                <canvas
+                  id="compare-chart"
+                  aria-label="Line chart comparing simple and yearly compound interest amounts"
+                ></canvas>
+                <div id="chart-tooltip" class="chart-tooltip" hidden></div>
+                <div id="chart-empty" class="chart-empty" hidden>
+                  Enter valid positive inputs to display the growth chart.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 2: Calculator -->
+      <section
+        id="panel-calculator"
+        class="tab-panel"
+        role="tabpanel"
+        aria-labelledby="tab-calculator"
+        hidden
+      >
+        <div class="section-head">
+          <div>
+            <h1>Interest Calculator</h1>
+            <p class="section-sub">
+              Compute exact interest earned, maturity amount, and inflation-adjusted value.
+            </p>
+          </div>
+          <div class="formula-note">
+            <span>Compound = P&times;(1 + R/(100n))<sup>nT</sup></span>
+            <span aria-hidden="true">&middot;</span>
+            <span>Real = Amount / (1 + i/100)<sup>T</sup></span>
+          </div>
+        </div>
+
+        <div class="studio-grid">
+          <form class="panel inputs-panel" id="calculator-form" novalidate>
+            <h2 class="panel-title">Parameters</h2>
+
+            <div class="field">
+              <label for="calc-principal">Principal Amount (&rupee;)</label>
+              <div class="input-wrap">
+                <span class="input-prefix" aria-hidden="true">&#8377;</span>
+                <input
+                  type="number"
+                  id="calc-principal"
+                  name="principal"
+                  value="10000"
+                  min="0"
+                  step="any"
+                  inputmode="decimal"
+                  aria-describedby="calc-principal-error"
+                />
+              </div>
+              <p class="field-error" id="calc-principal-error" role="alert"></p>
+            </div>
+
+            <div class="field">
+              <label for="calc-rate">Annual Interest Rate (%)</label>
+              <div class="input-wrap">
+                <input
+                  type="number"
+                  id="calc-rate"
+                  name="rate"
+                  value="10"
+                  min="0"
+                  step="any"
+                  inputmode="decimal"
+                  aria-describedby="calc-rate-error"
+                />
+                <span class="input-suffix" aria-hidden="true">%</span>
+              </div>
+              <p class="field-error" id="calc-rate-error" role="alert"></p>
+            </div>
+
+            <div class="field">
+              <label for="calc-years">Time Period (Years)</label>
+              <div class="input-wrap">
+                <input
+                  type="number"
+                  id="calc-years"
+                  name="years"
+                  value="3"
+                  min="0"
+                  step="any"
+                  inputmode="decimal"
+                  aria-describedby="calc-years-error"
+                />
+                <span class="input-suffix" aria-hidden="true">yrs</span>
+              </div>
+              <p class="field-error" id="calc-years-error" role="alert"></p>
+            </div>
+
+            <div class="field">
+              <span class="field-label-text" id="calc-type-label">Interest Type</span>
+              <div
+                class="segmented-control"
+                role="radiogroup"
+                aria-labelledby="calc-type-label"
+              >
+                <button
+                  type="button"
+                  role="radio"
+                  id="type-simple"
+                  class="segment-btn"
+                  data-type="simple"
+                  aria-checked="false"
+                >
+                  Simple
+                </button>
+                <button
+                  type="button"
+                  role="radio"
+                  id="type-compound"
+                  class="segment-btn is-active"
+                  data-type="compound"
+                  aria-checked="true"
+                >
+                  Compound
+                </button>
+              </div>
+            </div>
+
+            <div class="field" id="calc-frequency-field">
+              <label for="calc-frequency">Compounding Frequency</label>
+              <select id="calc-frequency" name="frequency">
+                <option value="1" selected>Yearly (1&times; / year)</option>
+                <option value="2">Half-yearly (2&times; / year)</option>
+                <option value="4">Quarterly (4&times; / year)</option>
+                <option value="12">Monthly (12&times; / year)</option>
+              </select>
+              <p class="field-hint" id="calc-frequency-hint">
+                Applies to compound interest calculations.
+              </p>
+            </div>
+
+            <hr class="panel-divider" />
+
+            <div class="field">
+              <div class="field-label-row">
+                <label for="calc-inflation">Inflation Rate (% / yr)</label>
+                <span class="field-optional">Optional</span>
+              </div>
+              <div class="input-wrap">
+                <input
+                  type="number"
+                  id="calc-inflation"
+                  name="inflation"
+                  value=""
+                  placeholder="0 (optional)"
+                  min="0"
+                  step="any"
+                  inputmode="decimal"
+                  aria-describedby="calc-inflation-hint calc-inflation-error"
+                />
+                <span class="input-suffix" aria-hidden="true">%</span>
+              </div>
+              <p class="field-hint" id="calc-inflation-hint">
+                Shows final maturity amount in today's purchasing power.
+              </p>
+              <p class="field-error" id="calc-inflation-error" role="alert"></p>
+            </div>
+          </form>
+
+          <div class="results-column">
+            <div class="panel calc-summary-panel">
+              <div class="calc-summary-head">
+                <h2 class="panel-title">Summary</h2>
+                <div class="calc-config-line" id="calc-config-line">
+                  Compound &middot; Yearly &middot; 3 years
+                </div>
+              </div>
+
+              <div class="calc-kpi-grid">
+                <div class="calc-kpi">
+                  <div class="kpi-label">Interest Earned</div>
+                  <div class="kpi-value kpi-value-interest" id="calc-interest-earned">
+                    &#8377;3,310.00
+                  </div>
+                  <div class="kpi-meta" id="calc-interest-share">24.87% of final amount</div>
+                </div>
+
+                <div class="calc-kpi">
+                  <div class="kpi-label">Final Amount</div>
+                  <div class="kpi-value kpi-value-final" id="calc-final-amount">
+                    &#8377;13,310.00
+                  </div>
+                  <div class="kpi-meta" id="calc-principal-echo">
+                    From &#8377;10,000.00 principal
+                  </div>
+                </div>
+
+                <div class="calc-kpi">
+                  <div class="kpi-label">Inflation-Adjusted Amount</div>
+                  <div class="kpi-value" id="calc-real-amount">&#8377;13,310.00</div>
+                  <div class="kpi-meta" id="calc-real-note">At 0% annual inflation</div>
+                </div>
+              </div>
+
+              <div class="ratio-block">
+                <div class="ratio-bar" aria-hidden="true">
+                  <div class="ratio-principal" id="calc-ratio-principal"></div>
+                  <div class="ratio-interest" id="calc-ratio-interest"></div>
+                </div>
+                <div class="ratio-labels">
+                  <span>
+                    <span class="ratio-swatch ratio-swatch-principal" aria-hidden="true"></span>
+                    Principal (<strong id="calc-principal-pct">75.1%</strong>)
+                  </span>
+                  <span>
+                    <span class="ratio-swatch ratio-swatch-interest" aria-hidden="true"></span>
+                    Interest (<strong id="calc-interest-pct">24.9%</strong>)
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel schedule-panel">
+              <div class="schedule-head">
+                <h2 class="panel-title">All Schedules for These Inputs</h2>
+                <span class="schedule-sub">Side-by-side maturity &amp; real values</span>
+              </div>
+              <div class="table-scroll">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Method</th>
+                      <th scope="col" class="num">Interest Earned</th>
+                      <th scope="col" class="num">Final Amount</th>
+                      <th scope="col" class="num">Inflation-Adjusted</th>
+                    </tr>
+                  </thead>
+                  <tbody id="calc-comparison-body">
+                    <tr data-method="simple">
+                      <td>Simple Interest</td>
+                      <td class="num" id="row-simple-int">&#8377;3,000.00</td>
+                      <td class="num" id="row-simple-final">&#8377;13,000.00</td>
+                      <td class="num" id="row-simple-real">&#8377;13,000.00</td>
+                    </tr>
+                    <tr data-method="1" class="is-selected">
+                      <td>Compound &mdash; Yearly</td>
+                      <td class="num" id="row-1-int">&#8377;3,310.00</td>
+                      <td class="num" id="row-1-final">&#8377;13,310.00</td>
+                      <td class="num" id="row-1-real">&#8377;13,310.00</td>
+                    </tr>
+                    <tr data-method="2">
+                      <td>Compound &mdash; Half-yearly</td>
+                      <td class="num" id="row-2-int">&#8377;3,400.96</td>
+                      <td class="num" id="row-2-final">&#8377;13,400.96</td>
+                      <td class="num" id="row-2-real">&#8377;13,400.96</td>
+                    </tr>
+                    <tr data-method="4">
+                      <td>Compound &mdash; Quarterly</td>
+                      <td class="num" id="row-4-int">&#8377;3,448.89</td>
+                      <td class="num" id="row-4-final">&#8377;13,448.89</td>
+                      <td class="num" id="row-4-real">&#8377;13,448.89</td>
+                    </tr>
+                    <tr data-method="12">
+                      <td>Compound &mdash; Monthly</td>
+                      <td class="num" id="row-12-int">&#8377;3,481.82</td>
+                      <td class="num" id="row-12-final">&#8377;13,481.82</td>
+                      <td class="num" id="row-12-real">&#8377;13,481.82</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 3: Goal -->
+      <section
+        id="panel-goal"
+        class="tab-panel"
+        role="tabpanel"
+        aria-labelledby="tab-goal"
+        hidden
+      >
+        <div class="section-head">
+          <div>
+            <h1>Savings Goal Timeline</h1>
+            <p class="section-sub">
+              Find out how many years it takes to grow your starting amount to a target goal.
+            </p>
+          </div>
+          <div class="formula-note">
+            <span>T = ln(Target / Start) / (n &times; ln(1 + R / (100n)))</span>
+          </div>
+        </div>
+
+        <div class="studio-grid">
+          <form class="panel inputs-panel" id="goal-form" novalidate>
+            <h2 class="panel-title">Goal Parameters</h2>
+
+            <div class="field">
+              <label for="goal-start">Starting Amount (&rupee;)</label>
+              <div class="input-wrap">
+                <span class="input-prefix" aria-hidden="true">&#8377;</span>
+                <input
+                  type="number"
+                  id="goal-start"
+                  name="start"
+                  value="10000"
+                  min="0"
+                  step="any"
+                  inputmode="decimal"
+                  aria-describedby="goal-start-error"
+                />
+              </div>
+              <p class="field-error" id="goal-start-error" role="alert"></p>
+            </div>
+
+            <div class="field">
+              <label for="goal-target">Target Amount (&rupee;)</label>
+              <div class="input-wrap">
+                <span class="input-prefix" aria-hidden="true">&#8377;</span>
+                <input
+                  type="number"
+                  id="goal-target"
+                  name="target"
+                  value="20000"
+                  min="0"
+                  step="any"
+                  inputmode="decimal"
+                  aria-describedby="goal-target-error"
+                />
+              </div>
+              <p class="field-error" id="goal-target-error" role="alert"></p>
+            </div>
+
+            <div class="field">
+              <label for="goal-rate">Annual Interest Rate (%)</label>
+              <div class="input-wrap">
+                <input
+                  type="number"
+                  id="goal-rate"
+                  name="rate"
+                  value="10"
+                  min="0"
+                  step="any"
+                  inputmode="decimal"
+                  aria-describedby="goal-rate-error"
+                />
+                <span class="input-suffix" aria-hidden="true">%</span>
+              </div>
+              <p class="field-error" id="goal-rate-error" role="alert"></p>
+            </div>
+
+            <div class="field">
+              <label for="goal-frequency">Compounding Frequency</label>
+              <select id="goal-frequency" name="frequency">
+                <option value="1" selected>Yearly (1&times; / year)</option>
+                <option value="2">Half-yearly (2&times; / year)</option>
+                <option value="4">Quarterly (4&times; / year)</option>
+                <option value="12">Monthly (12&times; / year)</option>
+              </select>
+            </div>
+
+            <hr class="panel-divider" />
+
+            <div class="field">
+              <div class="field-label-row">
+                <label for="goal-inflation">Inflation Rate (% / yr)</label>
+                <span class="field-optional">Optional</span>
+              </div>
+              <div class="input-wrap">
+                <input
+                  type="number"
+                  id="goal-inflation"
+                  name="inflation"
+                  value=""
+                  placeholder="0 (optional)"
+                  min="0"
+                  step="any"
+                  inputmode="decimal"
+                  aria-describedby="goal-inflation-hint goal-inflation-error"
+                />
+                <span class="input-suffix" aria-hidden="true">%</span>
+              </div>
+              <p class="field-hint" id="goal-inflation-hint">
+                Shows your target's purchasing power when reached.
+              </p>
+              <p class="field-error" id="goal-inflation-error" role="alert"></p>
+            </div>
+          </form>
+
+          <div class="results-column">
+            <div class="kpi-grid">
+              <div class="panel kpi-card kpi-card-accent">
+                <div class="kpi-label">Time to Reach Goal</div>
+                <div class="kpi-value" id="goal-years">7.27 years</div>
+                <div class="kpi-meta" id="goal-months">Approx. 87.3 months</div>
+                <div class="kpi-real">
+                  <span>Compounding</span>
+                  <strong id="goal-freq-label">Yearly</strong>
+                </div>
+              </div>
+
+              <div class="panel kpi-card">
+                <div class="kpi-label">Interest Required</div>
+                <div class="kpi-value" id="goal-gain">&#8377;10,000.00</div>
+                <div class="kpi-meta" id="goal-multiplier">2.00&times; starting amount</div>
+                <div class="kpi-real">
+                  <span>Target real value</span>
+                  <strong id="goal-real-target">&#8377;20,000.00</strong>
+                </div>
+              </div>
+
+              <div class="panel kpi-card">
+                <div class="kpi-label">Simple Interest Time</div>
+                <div class="kpi-value" id="goal-simple-years">10.00 years</div>
+                <div class="kpi-meta">Without compounding</div>
+                <div class="kpi-real">
+                  <span>Time saved</span>
+                  <strong id="goal-time-saved">2.73 years</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel schedule-panel">
+              <div class="schedule-head">
+                <h2 class="panel-title">Goal Timeline by Compounding Method</h2>
+                <span class="schedule-sub">Exact time needed to reach your target</span>
+              </div>
+              <div class="table-scroll">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Method</th>
+                      <th scope="col" class="num">Years Required</th>
+                      <th scope="col" class="num">Months</th>
+                      <th scope="col" class="num">Target Real Value</th>
+                    </tr>
+                  </thead>
+                  <tbody id="goal-comparison-body">
+                    <tr data-goal-method="1" class="is-selected">
+                      <td>Compound &mdash; Yearly</td>
+                      <td class="num" id="goal-row-1-years">7.27 years</td>
+                      <td class="num" id="goal-row-1-months">87.3 mo</td>
+                      <td class="num" id="goal-row-1-real">&#8377;20,000.00</td>
+                    </tr>
+                    <tr data-goal-method="2">
+                      <td>Compound &mdash; Half-yearly</td>
+                      <td class="num" id="goal-row-2-years">7.10 years</td>
+                      <td class="num" id="goal-row-2-months">85.2 mo</td>
+                      <td class="num" id="goal-row-2-real">&#8377;20,000.00</td>
+                    </tr>
+                    <tr data-goal-method="4">
+                      <td>Compound &mdash; Quarterly</td>
+                      <td class="num" id="goal-row-4-years">7.02 years</td>
+                      <td class="num" id="goal-row-4-months">84.2 mo</td>
+                      <td class="num" id="goal-row-4-real">&#8377;20,000.00</td>
+                    </tr>
+                    <tr data-goal-method="12">
+                      <td>Compound &mdash; Monthly</td>
+                      <td class="num" id="goal-row-12-years">6.96 years</td>
+                      <td class="num" id="goal-row-12-months">83.5 mo</td>
+                      <td class="num" id="goal-row-12-real">&#8377;20,000.00</td>
+                    </tr>
+                    <tr data-goal-method="simple">
+                      <td>Simple Interest</td>
+                      <td class="num" id="goal-row-simple-years">10.00 years</td>
+                      <td class="num" id="goal-row-simple-months">120.0 mo</td>
+                      <td class="num" id="goal-row-simple-real">&#8377;20,000.00</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script defer src="script.js"></script>
+  </body>
+</html>
